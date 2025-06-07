@@ -51,44 +51,33 @@ void Train::addCar(bool lightState) {
 
 int Train::getLength() {
   resetOperationCounter();
+  if (!first) return 0;
 
-  auto calculate = [this]() -> int {
-    if (!this->first) return 0;
+  Car* current = first;
 
-    auto* ptr = this->first;
-    bool initialLightState = ptr->light;
+  if (!current->light) {
+    current->light = true;
+    countOp++;
+  }
 
-    if (!initialLightState) {
-      ptr->light = true;
-      this->countOp++;
-    }
+  current = current->next;
+  countOp++;
 
-    int counter = 1;
-    ptr = ptr->next;
-    this->countOp++;
+  int length = 1;
+  while (!current->light) {
+    current = current->next;
+    length++;
+    countOp++;
+  }
 
-    auto detectLight = [this, &counter](auto* p) {
-      while (!p->light) {
-        p = p->next;
-        counter++;
-        this->countOp += 2;
-      }
-      p->light = false;
-      this->countOp++;
-      return p;
-    };
+  current->light = false;
+  countOp++;
 
-    ptr = detectLight(ptr);
+  if (!first->light) {
+    return length;
+  }
 
-    if (!this->first->light) {
-      return counter;
-    }
-
-    return -1;
-  };
-
-  int result = calculate();
-  return result != -1 ? result : getLength();
+  return getLength();
 }
 
 int Train::getOpCount() const { return countOp; }
