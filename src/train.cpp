@@ -48,13 +48,13 @@ void Train::addCar(bool lightState) {
         appendToExistingList(newNode);
     }
 }
-
 int Train::getLength() {
   resetOperationCounter();
   if (!first) return 0;
 
   Car* current = first;
 
+  countOp++;
   if (!current->light) {
     current->light = true;
     countOp++;
@@ -64,15 +64,19 @@ int Train::getLength() {
   countOp++;
 
   int length = 1;
-  while (!current->light) {
-    current = current->next;
-    length++;
+  while (true) {
     countOp++;
+    if (current->light) {
+      current->light = false;
+      countOp++;
+      break;
+    }
+    current = current->next;
+    countOp++;
+    length++;
   }
 
-  current->light = false;
   countOp++;
-
   if (!first->light) {
     return length;
   }
