@@ -1,21 +1,12 @@
 // Copyright 2021 NNTU-CS
 #include "train.h"
 
-Train::Train() : first(nullptr), countOp(0) {}
-
-Train::~Train() {
-  if (!first) return;
-
-  Car* current = first;
-  do {
-    Car* next = current->next;
-    delete current;
-    current = next;
-  } while (current != first);
-}
-
+Train::Train() : countOp(0), first(nullptr) {}
 void Train::addCar(bool light) {
-  Car* newCar = new Car(light);  // Используем конструктор
+  Car* newCar = new Car;
+  newCar->light = light;
+  newCar->next = nullptr;
+  newCar->prev = nullptr;
 
   if (!first) {
     first = newCar;
@@ -31,7 +22,7 @@ void Train::addCar(bool light) {
 }
 
 int Train::getLength() {
-  resetOperationCounter();
+  countOp = 0;
   if (!first) return 0;
 
   Car* current = first;
@@ -66,6 +57,4 @@ int Train::getLength() {
   return getLength();
 }
 
-int Train::getOpCount() const { return countOp; }
-
-void Train::resetOperationCounter() { countOp = 0; }
+int Train::getOpCount() { return countOp; }
