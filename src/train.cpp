@@ -15,7 +15,7 @@ Train::~Train() {
 }
 
 void Train::addCar(bool light) {
-  Car* newCar = new Car{light, nullptr, nullptr};
+  Car* newCar = new Car(light);  // Используем конструктор
 
   if (!first) {
     first = newCar;
