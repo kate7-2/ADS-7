@@ -1,10 +1,9 @@
 // Copyright 2021 NNTU-CS
 #include "train.h"
+
 Train::Train() : first(nullptr), countOp(0) {}
 
-Train::~Train() { cleanup(); }
-
-void Train::cleanup() {
+Train::~Train() {
   if (!first) return;
 
   Car* current = first;
@@ -13,41 +12,24 @@ void Train::cleanup() {
     delete current;
     current = next;
   } while (current != first);
-
-  first = nullptr;
 }
 
-Train::Car* Train::getLastCar() const {
-  if (!first) return nullptr;
-  return first->prev;
+void Train::addCar(bool light) {
+  Car* newCar = new Car{light, nullptr, nullptr};
+
+  if (!first) {
+    first = newCar;
+    first->next = first;
+    first->prev = first;
+  } else {
+    Car* last = first->prev;
+    last->next = newCar;
+    newCar->prev = last;
+    newCar->next = first;
+    first->prev = newCar;
+  }
 }
 
-void Train::addCar(bool lightState) {
-    auto createNewCar = [](bool light) {
-        return new Car(light);  // Явный вызов конструктора
-    };
-
-    auto linkToEmptyList = [this](Car* car) {
-        this->first = car;
-        car->next = car;
-        car->prev = car;
-    };
-
-    auto appendToExistingList = [this](Car* car) {
-        Car* tail = this->first->prev;
-        tail->next = car;
-        car->prev = tail;
-        car->next = this->first;
-        this->first->prev = car;
-    };
-
-    Car* newNode = createNewCar(lightState);
-    if (!this->first) {
-        linkToEmptyList(newNode);
-    } else {
-        appendToExistingList(newNode);
-    }
-}
 int Train::getLength() {
   resetOperationCounter();
   if (!first) return 0;
