@@ -23,31 +23,31 @@ Train::Car* Train::getLastCar() const {
 }
 
 void Train::addCar(bool lightState) {
-  auto createNewCar = [](bool light) {
-    return new Car(light);
-  };
+    auto createNewCar = [](bool light) {
+        return new Car(light);  // Явный вызов конструктора
+    };
 
-  auto linkToEmptyList = [this](Car* car) {
-    this->first = car;
-    car->next = car;
-    car->prev = car;
-  };
+    auto linkToEmptyList = [this](Car* car) {
+        this->first = car;
+        car->next = car;
+        car->prev = car;
+    };
 
-  auto appendToExistingList = [this](Car* car) {
-    auto* tail = this->first->prev;
-    tail->next = car;
-    car->prev = tail;
-    car->next = this->first;
-    this->first->prev = car;
-  };
+    auto appendToExistingList = [this](Car* car) {
+        Car* tail = this->first->prev;
+        tail->next = car;
+        car->prev = tail;
+        car->next = this->first;
+        this->first->prev = car;
+    };
 
-  Car* newNode = createNewCar(lightState);
-
-  if (this->first == nullptr) {
-    linkToEmptyList(newNode);
-  } else {
-    appendToExistingList(newNode);
-  }
+    Car* newNode = createNewCar(lightState);
+    
+    if (!this->first) {
+        linkToEmptyList(newNode);
+    } else {
+        appendToExistingList(newNode);
+    }
 }
 
 int Train::getLength() {
