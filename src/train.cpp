@@ -42,7 +42,6 @@ void Train::addCar(bool lightState) {
     };
 
     Car* newNode = createNewCar(lightState);
-    
     if (!this->first) {
         linkToEmptyList(newNode);
     } else {
