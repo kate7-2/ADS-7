@@ -1,29 +1,20 @@
-// Copyright 2021 NNTU-CS
+// Copyright 2022 NNTU-CS
 #ifndef INCLUDE_TRAIN_H_
 #define INCLUDE_TRAIN_H_
 
 class Train {
  private:
   struct Car {
-    bool light;
-    Car* next;
-    Car* prev;
-
-    explicit Car(bool l) : light(l), next(nullptr), prev(nullptr) {}
+    bool light; // состояние лампочки
+    Car *next;
+    Car *prev;
   };
-  Car* first;
-  int countOp;
-  void cleanup();
-  Car* getLastCar() const;
+  int countOp; // счетчик шагов (число переходов из вагона в вагон)
+  Car *first; // точка входа в поезд (первый вагон)
  public:
   Train();
-  ~Train();
-  Train(const Train&) = delete;
-  Train& operator=(const Train&) = delete;
-
-  void addCar(bool lightState);
-  int getLength();
-  int getOpCount() const;
-  void resetOperationCounter();
+  void addCar(bool light); // добавить вагон с начальным состоянием лампочки
+  int getLength();          // вычислить длину поезда
+  int getOpCount();         // вернуть число переходов (из вагона в вагон)
 };
 #endif  // INCLUDE_TRAIN_H_
