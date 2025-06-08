@@ -1,60 +1,79 @@
 // Copyright 2021 NNTU-CS
 #include "train.h"
-
 Train::Train() : countOp(0), first(nullptr) {}
-void Train::addCar(bool light) {
-  Car* newCar = new Car;
-  newCar->light = light;
-  newCar->next = nullptr;
-  newCar->prev = nullptr;
 
-  if (!first) {
-    first = newCar;
-    first->next = first;
-    first->prev = first;
-  } else {
+void Train::addCar(bool light) {
+  auto createNewCar = [light]() { return new Car{light, nullptr, nullptr}; };
+
+  auto initFirstCar = [this, &createNewCar]() { first = createNewCar(); };
+
+  auto addSecondCar = [this, &createNewCar]() {
+    Car* newCar = createNewCar();
+    first->next = newCar;
+    first->prev = newCar;
+    newCar->prev = first;
+    newCar->next = first;
+  };
+
+  auto insertNewCar = [this, &createNewCar]() {
+    Car* newCar = createNewCar();
     Car* last = first->prev;
+
     last->next = newCar;
     newCar->prev = last;
     newCar->next = first;
     first->prev = newCar;
+  };
+
+  if (!first) {
+    initFirstCar();
+  } else if (!first->next) {
+    addSecondCar();
+  } else {
+    insertNewCar();
   }
 }
+int Train::getOpCount() { return countOp; }
 
 int Train::getLength() {
   countOp = 0;
-  if (!first) return 0;
-
-  Car* current = first;
-
-  countOp++;
-  if (!current->light) {
-    current->light = true;
-    countOp++;
-  }
-
-  current = current->next;
-  countOp++;
-
-  int length = 1;
+  Car* tempObj;
   while (true) {
-    countOp++;
-    if (current->light) {
-      current->light = false;
-      countOp++;
-      break;
+    tempObj = first;
+    unsigned int countCar = 1;
+    if (!tempObj->light) {
+      tempObj->light = true;
     }
-    current = current->next;
-    countOp++;
-    length++;
+    tempObj = tempObj->next;
+    countOp += 2;
+    while (!tempObj->light) {
+      tempObj = tempObj->next;
+      countOp += 2;
+      countCar++;
+    }
+    tempObj->light = false;
+    if (!first->light) {
+      return countCar;
+    }
   }
-
-  countOp++;
-  if (!first->light) {
-    return length;
-  }
-
-  return getLength();
 }
 
-int Train::getOpCount() { return countOp; }
+Train::~Train() {
+  auto destroyCars = [this]() {
+    if (!this->first) return;
+
+    auto* current = this->first->next;
+    auto* stop = this->first;
+
+    while (current != stop) {
+      auto* nextCar = current->next;
+      delete current;
+      current = nextCar;
+    }
+
+    delete stop;
+    this->first = nullptr;
+  };
+
+  destroyCars();
+}
